@@ -4,16 +4,22 @@ from django.db import models
 
 
 class Candidate(models.Model):
-	name = models.CharField(max_length=10)
-	introduction = models.TextField()
-	area = models.CharField(max_length=15)
-	party_number = models.IntegerField(default = 0)
+    name = models.CharField(max_length=10)
+    introduction = models.TextField()
+    area = models.CharField(max_length=15)
+    party_number = models.IntegerField(default=0)
 
-	def __str__(self):
-		return self.name
+    def __str__(self):
+        return self.name
 
 
 class Poll(models.Model):
-	stratDate = models.DateTimeField()
-	endDate = models.DateTimeField()
-	area = models.CharField(max_length=15)
+    stratDate = models.DateTimeField()
+    endDate = models.DateTimeField()
+    area = models.CharField(max_length=15)
+
+
+class Choice(models.Model):
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    candidate = models.ForeignKey(Candidate)
+    votes = models.IntegerField(default=0)
