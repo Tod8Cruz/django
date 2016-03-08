@@ -11,3 +11,9 @@ class Candidate(models.Model):
 
 	def __str__(self):
 		return self.name
+
+
+class Poll(models.Model):
+	stratDate = models.DateTimeField()
+	endDate = models.DateTimeField()
+	area = models.CharField(max_length=15)
