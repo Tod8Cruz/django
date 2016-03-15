@@ -26,7 +26,8 @@
 	        <td> {{candidate.name}}</td>
 	        <td> {{candidate.introduction}} </td>
 	        <td> 기호{{candidate.party_number}}번 </td>
-	        <td><a href="areas/{{candidate.area}}/">지지하</a></td>
+
+	        <td><a href="areas/{{candidate.area}}/" class="btn btn-default" role="button">선택</a></td>
 	    </tr>
 	    {% endfor %}
 	    <tbody>
