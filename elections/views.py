@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import Candidate
+from .models import Candidate,Poll
 
-# Create your views here.
-
+import datetime
 
 def index(request):
     candidates = Candidate.objects.all()
@@ -13,6 +12,10 @@ def index(request):
 
 
 def areas(request, area):
-    candidates = Candidate.objects.filter(area = '미국')
-    context = {'candidates': candidates, 'area': area}
+    today = datetime.datetime.now()
+    if Poll.objects.filter( start_date__lte = today, end_date__gte = today):
+        candidates = Candidate.objects.filter(area = area)
+        context = {'candidates': candidates, 'area': area}
+    else:
+        context = {'no_poll': True, 'area': area}
     return render(request, 'elections/area.html', context)

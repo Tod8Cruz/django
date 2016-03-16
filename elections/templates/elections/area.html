@@ -10,7 +10,11 @@
 </head>
 <body>
 <div class="container">
-{{area}}
+<h1>{{area}}</h1>
+<br>
+{% if no_poll  %}
+투표가 없습니다.
+{% else %}
     <table class="table table-striped">
 	    <thead>
 	    <tr>
@@ -32,4 +36,6 @@
 	    {% endfor %}
 	    <tbody>
     </table>
+{% endif %}
+</div>
 </body>

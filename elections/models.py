@@ -14,8 +14,8 @@ class Candidate(models.Model):
 
 
 class Poll(models.Model):
-    stratDate = models.DateTimeField()
-    endDate = models.DateTimeField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     area = models.CharField(max_length=15)
 
 
