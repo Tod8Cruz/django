@@ -26,13 +26,14 @@ def areas(request, area):
 def polls(request, poll_id):
     poll = Poll.objects.get(pk=poll_id)
     selection = request.POST['choice']
-    choice = Choice.objects.get(poll_id = poll_id, candidate_id = selection)
-    if choice:
+    try:
+        choice = Choice.objects.get(poll_id = poll_id, candidate_id = selection)
         choice.votes += 1
         choice.save()
-        return HttpResponseRedirect(reverse('elections:result',args=(poll_id,)))
-    else:
-        choice = Choice()
+    except:
+        choice = Choice(poll_id = poll_id, candidate_id=selection, votes=1)
+        choice.save()
+    return HttpResponse("finish")
 
 
 def result(request, poll_id):
