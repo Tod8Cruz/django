@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from .models import Candidate, Poll, Choice
 import datetime
+from django.db.models import Sum
+
 
 def index(request):
     candidates = Candidate.objects.all()
@@ -12,29 +14,60 @@ def index(request):
 
 def areas(request, area):
     today = datetime.datetime.now()
-    poll = Poll.objects.get( start_date__lte = today, end_date__gte = today)
-    if poll:
+    try:
+        poll = Poll.objects.get(start_date__lte=today, end_date__gte=today)
         candidates = Candidate.objects.filter(area = area)
-        context = {'candidates': candidates, 
-        'area': area,
-        'poll_id': poll.id}
-    else:
-        context = {'no_poll': True, 'area': area}
+    except:
+        poll = None
+        candidate = None
+
+    context = {'candidates': candidates, 'area': area, 'poll': poll}
     return render(request, 'elections/area.html', context)
 
 
 def polls(request, poll_id):
-    poll = Poll.objects.get(pk=poll_id)
-    selection = request.POST['choice']
     try:
-        choice = Choice.objects.get(poll_id = poll_id, candidate_id = selection)
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        return HttpResponseNotFound('투표를 찾을 수 없습니다.')
+    selection = request.POST['choice']
+
+    try:
+        choice = Choice.objects.get(poll_id=poll_id, candidate_id=selection)
         choice.votes += 1
         choice.save()
     except:
-        choice = Choice(poll_id = poll_id, candidate_id=selection, votes=1)
+        choice = Choice(poll_id=poll_id, candidate_id=selection, votes=1)
         choice.save()
-    return HttpResponse("finish")
+    return HttpResponseRedirect("/areas/{}/results".format(poll.area))
 
 
-def result(request, poll_id):
-    return HttpResponse("result")
+def results(request, area):
+    polls = Poll.objects.filter(area=area)
+    candidates = Candidate.objects.filter(area=area)
+    poll_results = []
+    for poll in polls:
+        result = {}
+        result['start_date'] = poll.start_date
+        result['end_date'] = poll.end_date
+        rates = []
+        total_votes = Choice.objects.filter(
+            poll_id=poll.id).aggregate(
+            Sum('votes'))
+        result['total_votes'] = total_votes['votes__sum']
+        for candidate in candidates:
+            try:
+                choice = Choice.objects.get(
+                    poll_id=poll.id, candidate_id=candidate.id)
+                rates.append(
+                    round( choice.votes * 100 / result['total_votes'], 1))
+            except:
+                rates.append(0)
+        result['rates'] = rates
+        poll_results.append(result)
+
+    context = {
+        'area': area,
+        'candidates': candidates,
+        'poll_results': poll_results}
+    return render(request, 'elections/result.html', context)

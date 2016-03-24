@@ -32,7 +32,7 @@
 	        <td> 기호{{candidate.party_number}}번 </td>
 
 	        <td>
-	        	<form action = "/polls/{{poll_id}}/" method="post">
+	        	<form action = "/polls/{{poll.id}}/" method="post">
 	        		{% csrf_token %}
 	        		<button name="choice" value="{{candidate.id}}">선택</button>
 	        	</form>
