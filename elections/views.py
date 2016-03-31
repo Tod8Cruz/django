@@ -1,10 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from .models import Candidate, Poll, Choice
 import datetime
 from django.db.models import Sum
-
 def index(request):
     candidates = Candidate.objects.all()
     context = {'candidates': candidates}
@@ -25,21 +24,23 @@ def areas(request, area):
 
 
 def polls(request, poll_id):
-    poll = Poll.objects.get(pk=poll_id)
-    selection = request.POST['choice']
     try:
-        choice = Choice.objects.get(poll_id = poll_id, candidate_id = selection)
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        return HttpResponseNotFound('투표를 찾을 수 없습니다.')
+    selection = request.POST['choice']
+
+    try:
+        choice = Choice.objects.get(poll_id=poll_id, candidate_id=selection)
         choice.votes += 1
         choice.save()
     except:
-        choice = Choice(poll_id = poll_id, candidate_id=selection, votes=1)
+        choice = Choice(poll_id=poll_id, candidate_id=selection, votes=1)
         choice.save()
     return HttpResponseRedirect("/areas/{}/results".format(poll.area))
 
-
 def results(request, area):
     candidates = Candidate.objects.filter(area = area)
-
     polls = Poll.objects.filter(area = area)
     poll_results = []
     for poll in polls:
@@ -59,7 +60,6 @@ def results(request, area):
                 rates.append(0)
         result['rates'] = rates
         poll_results.append(result)
-
     context = {'candidates':candidates, 'area': area,
     'poll_results': poll_results}
     return render(request, 'elections/result.html', context)

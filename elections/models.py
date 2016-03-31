@@ -19,6 +19,8 @@ class Poll(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     area = models.CharField(max_length=15)
+    def __str__(self):
+        return "{}({}~{})".format(self.area,self.start_date,self.end_date)
 
 
 class Choice(models.Model):
