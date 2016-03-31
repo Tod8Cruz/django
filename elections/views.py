@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, Http404
 from django.core.urlresolvers import reverse
 from .models import Candidate, Poll, Choice
 import datetime
@@ -8,6 +8,15 @@ def index(request):
     candidates = Candidate.objects.all()
     context = {'candidates': candidates}
     return render(request, 'elections/index.html', context)
+
+
+def candidates(request, name):
+    try:
+        candidate = Candidate.objects.get(name = name)
+    except:
+        raise Http404
+        # return HttpResponseNotFound("없는 페이지입니다.")
+    return HttpResponse(candidate.name)
 
 
 def areas(request, area):
