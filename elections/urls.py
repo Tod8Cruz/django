@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'elections'
 urlpatterns = [
-    url(r'^$', views.index),
+    url(r'^$', views.index, name = 'home'),
     url(r'^candidates/(?P<name>[가-힣]+)/$', views.candidates),
     url(r'^areas/(?P<area>[가-힣]+)/$', views.areas),
     url(r'^areas/(?P<area>[가-힣]+)/results$', views.results),
