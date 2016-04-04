@@ -22,7 +22,7 @@ def areas(request, area):
         candidates = Candidate.objects.filter(area = area)
     except:
         poll = None
-        candidate = None
+        candidates = None
 
     context = {'candidates': candidates, 'area': area, 'poll': poll}
     return render(request, 'elections/area.html', context)
